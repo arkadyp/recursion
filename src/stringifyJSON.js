@@ -30,6 +30,14 @@ var stringifyJSON = function (obj) {
 		return str;
 	}
 	else { //obj is an Object with keys and values
+		var str = "{";
+		_.each(obj, function(val, key) {
+			if(!(typeof(val) === 'undefined' || typeof(val) === 'function')) { //JSON.stringify does not include values that are functions/undefinted
+				str += "\""+key+"\":"+stringifyJSON(val)+","; //creates an extra comma at end
+			}
+		});
+		(str.length > 1) ? str = str.slice(0,str.length-1)+"}" : str += "}"; //remove trailing comma		
+		return str;
 	}
 
 };
