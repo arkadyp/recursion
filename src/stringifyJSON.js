@@ -17,6 +17,17 @@ var stringifyJSON = function (obj) {
 		return 'null';
 	}
 	else if(Array.isArray(obj)) {
+		var str = "[";
+		_.each(obj, function(val) {
+			if(typeof(val) === 'function') { //JSON.stringify returns null if function is in array
+				str += 'null,';
+			}
+			else {
+				str += stringifyJSON(val)+","; //creates an extra comma at end	
+			}			
+		});
+		(str.length > 1) ? str = str.slice(0,str.length-1)+"]" : str += "]"; //remove trailing comma
+		return str;
 	}
 	else { //obj is an Object with keys and values
 	}
