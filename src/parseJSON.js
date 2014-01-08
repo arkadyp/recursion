@@ -8,31 +8,44 @@ var parseJSON = function (json) {
   //
   var value;
 
-  var processArray = function() {
+  var processArray = function(stringArr) {  //receives string without brackets
+    
+    
+    
     //cycle through this string and look for commas that aren't enclosed in quotations marks
-    value = [];
-    var substr = ""; //store indiv string
-    var arrayElements = [];  //store stringy array elements
-    var insideString = false; //check if inside string, if so, commas don't count as splitting apart array
-    for(var c = 1; c < json.length-1; c++) {
-      if(json[c] === '"' && insideString) { //end of string
-        insideString = false;
-      } else if(json[c] === '"') { //start of string value
-        insideString = true;
+    //"8,8,8" --> ["8","8","8"] --, process "8"  -> push on to array
+    //8,"a",true --> ["8", ""a"", "true"]
+    var splitArray = function() {  
+      var arrayElements = [];  //store stringy array elements
+      var substr = ""; //store indiv string
+      var insideString = false;
+      for(var c = 0; c < stringArr.length; c++) {
+        if(!insideString && stringArr[c] === ',') { //comma outside of string --> push element
+          arrayElements.push(subr);
+        } else {
+          substr += stringArr[c]; 
+          if(stringArr[c] === '"') {
+            insideString = true;  //encounter first quotation
+          } else if(stringArr[c] === '"' && insideString) {
+            insideString = false; //encounter quotation close                      
+          }  
+        }
       }
-
-      if(json[c] === ',' && !insideString) { //found array element
-        arrayElements.push(substr);
-        substr = "";
-        c++;
-      } else {
-        substr += json[c];
-      }
+      return arrayElements;
     }
-    arrayElements.push(substr);
-    console.log(arrayElements);
 
+    //assign array of simple string items to be process recursively
+    var tokens = splitArray(json);
+    console.log("TOKENS: "+tokens);
+    //process tokens
+    _.each(tokens, function(val) {
+      value.push(parseJSON(val));
+    }); 
+
+    console.log("VALUES: "+ value);
+    
     return value;
+    
   };
 
   if(!isNaN(Number(json))) {
@@ -46,11 +59,36 @@ var parseJSON = function (json) {
   } else if(json[0] === '"') {  //json value is string
     value = json.slice(1, json.length-1);
   } else if(json[0] === '[') {  //proccess array
-    processArray();
+    //pass content between '[' and ']' to processArray
+    var arrStringContent = json.slice(1, json.length-1);
+    value = processArray(arrStringContent);
   }
 
 
-  console.log(value);
+  
   return value;
 
 };
+
+
+
+//for(var c = 1; c < json.length-1; c++) {
+    //   if(json[c] === '"' && insideString) { //end of string        
+    //     insideString = false;        
+    //   } else if(json[c] === '"') { //start of string value
+    //     insideString = true;
+    //     substr += json[c]; //push initial quotation mark on string
+    //   }
+
+    //   if(json[c] === ',' && !insideString) { //found array element
+    //     arrayElements.push(substr);
+    //     substr = "";
+    //     c++;
+    //   } else {
+    //     substr += json[c];
+    //   }
+    // }
+
+
+
+
