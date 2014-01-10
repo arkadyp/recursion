@@ -7,50 +7,43 @@ var parseJSON = function (json) {
   //check if json string is number
   //
   var value;
-  debugger;
-  var processArray = function(stringArr) {  //receives string without brackets    
-    value = [];
+
+  var processArray = function(stringArr) {  //receives string without brackets
+    var array = [];
     //if array content is empty, pass it back
     if(stringArr === "") {
-      return value;
+      return array;
     }
 
     //cycle through this string and look for commas that aren't enclosed in quotations marks
     //"8,8,8" --> ["8","8","8"] --, process "8"  -> push on to array
     //8,"a",true --> ["8", ""a"", "true"]
-    var splitArray = function() {
-      var arrayElements = [];  //store stringy array elements
-      var substr = ""; //store indiv string
-      var insideString = false;
+    var arrayElements = [];  //store stringy array elements
+    var substr = ""; //store indiv string
+    var insideString = false;
 
-      for(var c = 0; c < stringArr.length; c++) {
-        if(!insideString && stringArr[c] === ',') { //comma outside of string --> push element
-          arrayElements.push(substr);
-          substr = "";
-        } else {
-          substr += stringArr[c];
-          if(stringArr[c] === '"') {
-            insideString = true;  //encounter first quotation
-          } else if(stringArr[c] === '"' && insideString) {
-            insideString = false; //encounter quotation close
-          }
+    for(var c = 0; c < stringArr.length; c++) {
+      if(!insideString && stringArr[c] === ',') { //comma outside of string --> push element
+        //arrayElements.push(substr); //string ready to be processed
+        arrayElements.push(parseJSON(substr));
+        substr = "";
+      } else if(!insideString && stringArr[c] === '[') {  //check if it's start of new element
+        console.log('array contents');
+        console.log(stringArr);
+        console.log('sub array');
+        substr = stringArr.slice(c, stringArr.lastIndexOf(']')+1);
+        console.log(substr);
+      } else {
+        substr += stringArr[c];
+        if(stringArr[c] === '"') {
+          insideString = true;  //encounter first quotation
+        } else if(stringArr[c] === '"' && insideString) {
+          insideString = false; //encounter quotation close
         }
       }
-      arrayElements.push(substr); //push on last element
-      return arrayElements;
-    };
-
-    //assign array of simple string items to be process recursively
-    var tokens = splitArray(stringArr);
-    console.log("TOKENS: "+tokens);
-    //process tokens
-    _.each(tokens, function(val) {
-      value.push(parseJSON(val));
-    });
-
-    console.log("VALUES: "+ value);
-
-    return value;
+    }
+    arrayElements.push(parseJSON(substr)); //push on last element
+    return arrayElements;
   };
 
   if(!isNaN(Number(json))) {
