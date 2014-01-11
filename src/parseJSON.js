@@ -33,6 +33,9 @@ var parseJSON = function (json) {
         console.log('sub array');
         substr = stringArr.slice(c, stringArr.lastIndexOf(']')+1);
         console.log(substr);
+        arrayElements.push(parseJSON(substr));
+        c += substr.length;
+        substr = "";
       } else {
         substr += stringArr[c];
         if(stringArr[c] === '"') {
@@ -42,9 +45,14 @@ var parseJSON = function (json) {
         }
       }
     }
-    arrayElements.push(parseJSON(substr)); //push on last element
+    if(c < stringArr.length+1) {
+      arrayElements.push(parseJSON(substr)); //push on last element
+    }
     return arrayElements;
   };
+
+
+
 
   if(!isNaN(Number(json))) {
     return Number(json);
@@ -58,6 +66,7 @@ var parseJSON = function (json) {
     value = json.slice(1, json.length-1);
   } else if(json[0] === '[') {  //proccess array
     //pass content between '[' and ']' to processArray
+    //debugger;
     var arrStringContent = json.slice(1, json.length-1);
     value = processArray(arrStringContent);
   }
